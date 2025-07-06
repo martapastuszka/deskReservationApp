@@ -5,121 +5,75 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
+
+    /* width: 100vw;
+    height: 100vh; */
+    overflow: hidden;
 }
 
-.main-container {
-    height: calc(100vh - 56px); /* Adjust based on navbar height */
-  }
-
-/* body{
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #6f97c4;
-    border: 10px solid #ff0000;
-} */
-
-/* body{
-    /* height: 100%;
-    width: 100%; */
-    /* height: 100vh;
-    width: 100vw; */
-    /* font-family: Arial, sans-serif; */
-/* } */ 
+/* home.html styling */
 
 body,html {
     height: 100%;
     margin: 0;
-  }
-  .main-container {
-    height: calc(100vh - 56px); /* Adjust based on navbar height */
-  }
-
-.wrapper {
-    display: flex;
-    justify-content: center; /* centers horizontally */
-    align-items: flex-start; /* aligns to the top */
-    height: 100vh;           /* optional: full viewport height */
-    padding-top: 2rem;       /* optional: spacing from the top */
-
 }
 
+.main-container {
+    height: calc(100vh - 56px); /* Adjust based on navbar height */
+}
 
-/* .container {
-    display: flex;
-    height: 100vh;
-
-    border: 2px solid #16ddbf;
-} */
-
-/* .sidebar {
-    width: 50%;
-    background-color: #7d7d7d51;
-    color: rgb(248, 21, 21);
-    /* padding: 1rem; */
-    /* border: 2px solid #000; */
-  /* } */ 
-
-  .plan {
+.plan {
     background-color: #f9f9f9;
-    /* padding: 2rem; */
-    /* border: 2px solid #bf2323; */
-
     display: flex;
-    justify-content: center; /* poziome wyśrodkowanie */
-    align-items: center;     /* pionowe wyśrodkowanie */
+    justify-content: center;
+    align-items: center;    
 } 
 
-
-/* .calendar{ */
-    /* width: 380px; */
-    /* width: auto; */
-
-    /* height: auto;
-    display: flex;
-    /* flex-direction: column; */
-    /* padding: 10px;
-    padding: 1px;
-
-    /* background: #fff; */
-    /* border-radius: 10px; */
-    /* box-shadow: 0 0 10px rgba(0,0,0,0.3); */ 
-/* } */
+.calendar{
+    padding-right: 1rem;;
+}
 
 .header{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* padding: 10px; */
     padding: 1px;
     font-size: 13px;
-
 }
 
 .monthYear{
     text-align: center;
-    /* font-weight: 600; */
-    font-weight: 600;
+    font-weight: 400;
     font-size: 13px;
-
-    /* width: 150px; */
 }
 
 .header button{
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
+    /* border: none; */
     border-radius: 50%;
-    background: #fff;
+    background: #dfdfdf;
     cursor: pointer;
-    /* width: 40px;
-    height: 40px; */
-    width: 0px;
-    height: 0px;
-    box-shadow: 0 0 4px rgba(0,0,0,0.2);
-}
+    width: 20px;
+    height: 20px;
+    /* box-shadow: 0 0 4px rgba(162, 161, 161, 0.2);  */
+} 
+
+/* .header i { */
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+    /* border: none; */
+    /* border-radius: 50%; */
+    /* background: #dfdfdf; */
+    /* cursor: pointer;
+    width: 20px;
+    height: 20px;
+    box-shadow: 0 0 4px rgba(162, 161, 161, 0.2); */
+/* } */
+
+
 
 .days{
     display: grid;
@@ -129,11 +83,9 @@ body,html {
 .day{
     text-align: center;
     padding: 5px;
-    color: #999FA6;
-    /* font-weight: 500; */
-    font-weight: 500;
+    color: #afb2b4;
+    font-weight: 400;
     font-size: 12px;
-
 }
 
 .dates{
@@ -141,7 +93,6 @@ body,html {
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
     gap: 1px;
-
 }
 
 .date{
@@ -152,20 +103,17 @@ body,html {
     padding: 10px;
     margin: auto;
     cursor: pointer;
-    font-weight: 600;
-    border-radius: 50%;
-    /* width: 40px;
-    height: 40px; */
+    font-weight: 400;
+    border-radius: 80%;
     width: 10px;
     height: 10px;
     transition: 0.2s;
     font-size: 12px;
-    
 }
 
 .date:hover,
 .date.active{
-    background: #ff5869;
+    background: #ff5768;
     color: #fff;
 }
 
@@ -177,5 +125,218 @@ body,html {
     color: #fff;
 }
 
+/* login.html styling */
+
+.svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.content-container {
+    height: 100vh;
+    /* padding: 1rem; */
+}
+
+/* svg {
+    max-width: 2000%;
+    height: 50%;
+} */
+
+.content-container{
+    /* height: 100%; */
+    margin-top: 200px;
+    padding:30px;
+    justify-content: center; /* Horizontal centering */
+    align-items: center;     /* Vertical centering */
+    height: 100vh;        /* Make sure the div has some height */
+}
 
 
+.btn-primary{
+    background-color: rgb(90, 107, 128);
+    border: rgb(90, 107, 128);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:active:focus {
+  background-color: #59a5a7 !important;
+  border-color: #59a5a7 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* input {
+    color: #59a5a7; /* Changes the text color inside the input */
+    /* background-color: #59a5a7; */
+    /* border: 1px solid #cc0000; */
+/* } */
+
+.form-control{
+    background-color: #59a5a7 !important;   
+}
+
+.form-control:focus,
+.form-control:hover,
+/* .form-control:active, */
+.form-control:disabled,
+.form-control:focus-visible,
+.form-control:focus-within,
+.form-control:target,
+.form-control:invalid,
+.form-control:user-invalid,
+.form-control:read-only,
+.form-control:read-write,
+.form-control:required,
+.form-control:open,
+.form-control:placeholder-shown,
+.form-control:placeholder,
+.form-control:autofill,
+.form-control:active:focus {
+  background-color: #59a5a7 !important; /* Slightly darker red */
+  border-color: #59a5a7 !important;
+  box-shadow: none !important;
+}
+
+.form-control::placeholder {
+    color: gray !important;
+    opacity: 0.7;
+  }
+
+
+.timeBoxContainer{
+    /* display: flex; */
+    /* height: 300px; */
+    margin-top: 150px;
+    font-weight: 400;
+    font-size: 13px;
+    color: white;
+    /* padding: 1rem; */
+    /* border-radius: 8px; */
+    width: fit-content;
+    padding-left: 1.3rem;
+}
+
+.time-inputs {
+    display: flex;
+    gap: 1rem;
+    /* margin-top: 0.5rem; */
+  }
+  
+  .time-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0;
+    margin: 0;
+  }
+
+
+  .time-form label[for="start-time"] {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+  }
+
+
+
+  .nav-link {
+    color: #000;
+    /* padding: 10px 15px; */
+    text-decoration: none;
+  }
+  
+  .nav-link:hover {
+    background-color: #e9ecef;
+    color: #000;
+  }
+  
+  .nav-link.active {
+    background-color: #0d6efd;
+    color: #fff;
+  }
+
+  .d-flex{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 1rem;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    padding-bottom:2rem;
+
+  }
+
+  .p-3{
+    display:flex;
+    padding: 0 !important;
+    margin-bottom: 1rem;
+    font-size: 14px;
+    width: 100%;
+    text-align: left;
+    height: 100%;
+   
+  }
+
+
+  .nav-link.active{
+    box-shadow: #000;
+    padding-left: 2 !important;
+   
+ 
+    /* border-top: 1px solid #000; */
+  }
+
+
+
+ .navbar{
+    padding-left: 0 !important;
+
+ }
+
+ 
+.calendar{
+    padding-left: 1.3rem;
+    padding-top: 1rem;
+}
+
+
+/* Basic styles for modal */
+.modal{
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px; /* Could be more or less, depending on screen size */
+}
+
+.close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -1,8 +1,10 @@
 from website import create_app
 
+
 #zweryfikowac sposob pobierania bootstrap - nowsze wersje potrzebne
 
 app = create_app()
+
 
 """
 if __name__ == '__main__'::
@@ -24,3 +26,5 @@ Dostarcza szczegółowe informacje o błędach i wyjątki, które mogą wystąpi
     # przy każdej zmianie w kodzie pythona automatycznie re-runs web server
     # na produkcji ustawia się ten parametr na False
     app.run(debug = True)
+
+    
