@@ -8,6 +8,7 @@ from . import db
 import json
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 from flask import Flask
 
 
@@ -101,24 +102,31 @@ def desks_status():
 # Rezerwacja biurka
 @views.route('/reserve-desk', methods=['POST'])
 def reserve_desk():
-    data = request.get_json(silent=True) or {}
-    desk_id = data.get('desk_id')
-    print(desk_id)
-    # if not desk_id:
-    #     return jsonify(success=False, message='Brak desk_id'), 400
+    try:
+        #1 odczyt danych z żądania:
+        data = request.get_json(silent=True) or {}
+        desk_id = data.get('desk_id')
+        print('DEBUG desk_id:', desk_id)
     
-    # desk = Desk.query.filter_by(desk_id=desk_id).first()
-
-    # if not desk:
-    #     return jsonify(success=False, message='Biurko nie istnieje'), 404
-
-    # if desk.reserved:
-    #     return jsonify(success=False, message='Biurko już jest zarezerwowane'), 409
+        if not desk_id:
+            return jsonify(success=False, message='Brak desk_id'), 400
+        
+        #2 pobranie biurka z bazy
+        desk = Desk.query.filter_by(desk_id=desk_id).first()
+        print('DEBUG desk:', desk)  
+        if not desk:
+            return jsonify(success=False, message='Biurko nie istnieje'), 404
+        if desk.reserved:
+            return jsonify(success=False, message='Biurko już jest zarezerwowane'), 409
     
-    # # Rezerwujemy biurko
-    # desk.reserved = True
-    # db.session.commit()
-    return jsonify(success=True)
+        #3 Rezerwujemy biurko
+        desk.reserved = True
+        db.session.commit()
+        return jsonify(success=True), 200
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify(success=False, message=str(e)), 500
 
 #Usuwanie rezerwacji
 @views.route('/cancel-reservation', methods=['POST'])

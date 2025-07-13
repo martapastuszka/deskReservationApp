@@ -34,3 +34,12 @@
     })
     .catch(err => console.error(err));
   });
+
+
+  // Hook the Cancel Booking button
+  // Zanim obsłużę Cancel Button to muszę się upewnić, że jeśli biurko ma status zarezerwowane, to po kliknięciu na nie pojawi mi sie
+  // w modalu przycisk cancel reserwation
+  // zeby to zrobic, to muszę odpytać bazę danych - czy biurko jest zarezerwowane, jak tak to open modal z dodatkowym przyciskiem 
+  // albo po prostu zmień widoczność przycisku - czyli domyślnie ten przycisk istnieje tylko jest hidden.
+  // jak biurko nie jest zarezerwowane to obsługiwany będzie przycisk Book.
+  
