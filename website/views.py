@@ -103,20 +103,21 @@ def desks_status():
 def reserve_desk():
     data = request.get_json(silent=True) or {}
     desk_id = data.get('desk_id')
-    if not desk_id:
-        return jsonify(success=False, message='Brak desk_id'), 400
+    print(desk_id)
+    # if not desk_id:
+    #     return jsonify(success=False, message='Brak desk_id'), 400
     
-    desk = Desk.query.filter_by(desk_id=desk_id).first()
+    # desk = Desk.query.filter_by(desk_id=desk_id).first()
 
-    if not desk:
-        return jsonify(success=False, message='Biurko nie istnieje'), 404
+    # if not desk:
+    #     return jsonify(success=False, message='Biurko nie istnieje'), 404
 
-    if desk.reserved:
-        return jsonify(success=False, message='Biurko już jest zarezerwowane'), 409
+    # if desk.reserved:
+    #     return jsonify(success=False, message='Biurko już jest zarezerwowane'), 409
     
-    # Rezerwujemy biurko
-    desk.reserved = True
-    db.session.commit()
+    # # Rezerwujemy biurko
+    # desk.reserved = True
+    # db.session.commit()
     return jsonify(success=True)
 
 #Usuwanie rezerwacji

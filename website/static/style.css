@@ -294,6 +294,8 @@ body,html {
   }
 
 
+  
+
 
  .navbar{
     padding-left: 0 !important;
@@ -340,3 +342,11 @@ body,html {
     text-decoration: none;
     cursor: pointer;
 }
+
+.desk {
+    pointer-events: auto;   /* element reaguje na kliknięcia */
+  }
+
+.desk--reserved {
+    background-color: red; /* albo dowolny inny styl – np. obramowanie */
+  }
