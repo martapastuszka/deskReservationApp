@@ -117,8 +117,13 @@ body,html {
     color: #fff;
 }
 
+.date.selected{
+    background: #08e85a;
+    color: #fff;
+}
+
 .date.inactive{
-    color: #d2d2d2;
+    color: #666464;
 }
 
 .date.inactive:hover{

@@ -30,9 +30,9 @@ class Booking(db.Model):
     __tablename__ = 'booking'
     id = db.Column(db.Integer, primary_key=True)
     desk_id = db.Column(db.Integer, db.ForeignKey('desk.id'), nullable=False)
-    # start_time = db.Column(db.DateTime, nullable=False)
+    day = db.Column(db.DateTime, nullable=False)
     # end_time = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     # Relacje z innymi tabelami
     desk = db.relationship('Desk', backref=db.backref('bookings', lazy=True))
@@ -50,9 +50,9 @@ class Booking(db.Model):
     #     self.end_time = end_time
     #     self.user_id = user_id
 
-    def __init__(self, desk_id, user_id):
+    def __init__(self, desk_id, day):
         self.desk_id = desk_id
-        self.user_id = user_id
+        self.day = day
 
     def __repr__(self):
         return f'<Booking {self.id}>'

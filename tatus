@@ -1,0 +1,17 @@
+[33mcommit cccaa32a5593a6dd49c0d64e93e0d31b8103d70d[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Marta <marta.pastuszka.mp@gmail.com>
+Date:   Sun Jul 13 20:08:53 2025 +0200
+
+    implement booking desk in db
+
+[33mcommit de06c08bc36eb7c9dd672e2c7c521d7d8bf02a0c[m
+Author: Marta <marta.pastuszka.mp@gmail.com>
+Date:   Sun Jul 13 18:56:52 2025 +0200
+
+    Code refactor
+
+[33mcommit 31954535779cd49b7ec85c531c62d7940d955c42[m
+Author: Marta <marta.pastuszka.mp@gmail.com>
+Date:   Sun Jul 6 13:34:02 2025 +0200
+
+    draft add/remove reservation from db
