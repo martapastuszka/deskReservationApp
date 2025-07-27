@@ -10,9 +10,10 @@ import json
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import and_, exists
+from sqlalchemy import and_, exists, func
 from sqlalchemy.orm import joinedload
 from flask import Flask
+from datetime import date, timedelta
 
 
 
@@ -29,43 +30,46 @@ CORS(views)
 def home():            
     return render_template("home.html", user = current_user)
 
+
 @views.route('/desk-status', methods=['POST'])
 def desk_status():
     try:
         data = request.get_json(silent=True) or {}
         desk_id = data.get('desk_id')
-        date = data.get('date')
+        date    = data.get('date')
 
         if not desk_id or not date:
             return jsonify(success=False, message='No desk_id or date'), 400
 
-        date_object = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
-        print(desk_id)
-        print(date_object)
-        print(current_user.id)
+        date_obj = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+
         booking = (
             db.session.query(Booking)
-            .join(User, Booking.user_id == User.id)
-            # .options(joinedload(Booking.user))    # optional but keeps it efficient
-            .filter(
-                and_(
-                    Booking.desk_id == desk_id,
-                    Booking.day     == date_object   # adjust if Booking.day contains full timestamp
-                )
-            )
+            .filter(Booking.desk_id == desk_id, Booking.day == date_obj)
             .first()
         )
-        bookedByMe = False
-        if booking:
-            if booking.user.id == current_user.id:
-                bookedByMe = True
-            return jsonify(success=True, reserved=True, user_name=booking.user.first_name, bookedByMe=bookedByMe), 200
-        else:
-            return jsonify(success=True, reserved=False, user_name=None, bookedByMe=False), 200
-    
+
+        desk_count = (
+            db.session.query(func.count(Booking.id))
+            .filter(Booking.user_id == current_user.id,
+                    func.date(Booking.day) == date_obj.date())
+            .scalar()
+        )
+
+        response_payload = {
+            'success': True,
+            'reserved': bool(booking),
+            'user_name': booking.user.first_name if booking else None,
+            'user_role': current_user.role,         
+            'bookedByMe': booking.user_id == current_user.id if booking else False,
+            'my_desk_count': desk_count
+        }
+        return jsonify(response_payload), 200
+
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify(success=False, message=str(e)), 500
+
 
 
 @views.route('/get-bookings', methods=['POST'])
@@ -118,28 +122,10 @@ def reserve_desk():
         db.session.rollback()
         return jsonify(success=False, message=str(e)), 500
 
+
 @views.route('/cancel-reservation', methods=['POST'])
 def cancel_reservation():
     try: 
-        # data = request.get_json(silent=True) or {}
-        # desk_id = data.get('desk_id')
-        # print('DEBUG desk_it', desk_id)
-
-        # if not desk_id:
-        #     return jsonify(success=False, message='Brak desk_id'), 400
-        
-        # desk = Desk.query.filter_by(desk_id=desk_id).first()
-        # print('DEBUG desk:', desk)
-
-        # if not desk:
-        #     return jsonify(success=False, message='Biurko nie istnieje'), 404
-        
-        # if not desk.reserved:
-        #     return jsonify(success=False, message='Biurko nie jest obecnie zarezerwowane'), 409
-        
-        # desk.reserved = False
-        # db.session.commit()
-        # return jsonify(success=True, reserved=False), 200
         data = request.get_json(silent=True) or {}
         desk_id = data.get('desk_id')
         date = data.get('date')
@@ -161,6 +147,46 @@ def cancel_reservation():
         return jsonify(success=False, message=str(e)), 500
 
 
+# 
+# from flask import jsonify
+# from sqlalchemy import func
+@views.route('/occupancy-data', methods=['GET'])
+def occupancy_data():
+    try:
+        today       = date.today()
+        window_size = 14
+        window      = [today + timedelta(days=i) for i in range(window_size)]
+
+        # Sub-query: count bookings by *calendar* date in the window
+        rows = (
+            db.session
+            .query(
+                func.date(Booking.day).label('day'),  # strip time component
+                func.count(Booking.id).label('bookings')
+            )
+            .filter(
+                Booking.day >= today,
+                Booking.day <  today + timedelta(days=window_size)
+            )
+            .group_by(func.date(Booking.day))
+            .all()
+        )
+
+        # rows -> { '2023-09-28': 12, ... }
+        raw_counts = { str(r.day): r.bookings for r in rows }
+
+        labels = [d.isoformat() for d in window]
+        data   = [raw_counts.get(lbl, 0) for lbl in labels]
+
+        return jsonify({
+            'labels': labels,
+            'data'  : data,
+            'success': True
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify(success=False, message=str(e)), 500
 
 
 

@@ -222,12 +222,31 @@ updateCalendar();
   function updateModal(data, desk, date){
     const bookBtn = document.getElementById('book-btn');
     const titleEl = document.querySelector('#myModal .modal-title');
-    const bookBody = document.getElementById('book-body');
-    // bookDate.textContent = 'At: ' + date.split(" ")[0];
-    titleEl.textContent = "Desk: " + desk + " at: " + date.split(" ")[0] + " is"
+    const bookReservation = document.getElementById('book-reservation');
+    const bookCount = document.getElementById('book-count');
+
+    switch (data.user_role) {
+      case "user":
+        canReserve = data.my_desk_count < 1;
+        break;
+      case "manager":
+        canReserve = data.my_desk_count < 2;
+        break;
+      case "admin":
+        canReserve = true;
+        break;
+      default:
+        canReserve = false;
+    }
+    
+    bookBtn.removeAttribute('disabled');
+    bookBtn.style.display = 'inline-block';
+    
+    titleEl.textContent = "Desk: " + desk + " at: " + date.split(" ")[0] + " is";
+    bookCount.textContent = 'You have ' + data.my_desk_count + ' desks reserved for that day';
     if(data.reserved){
-      bookBody.textContent = `Reserved by ${data.bookedByMe ? 'You' : data.user_name}`;
-      if(data.bookedByMe){
+      bookReservation.textContent = `Reserved by ${data.bookedByMe ? 'You' : data.user_name}`;
+      if(data.bookedByMe || data.user_role == 'admin'){
         bookBtn.textContent = 'Cancel reservation';
         bookBtn.onclick = cancel_reservation;
         bookBtn.style.display = 'inline-block';
@@ -236,10 +255,15 @@ updateCalendar();
         bookBtn.style.display = 'none';
       }
     }else{
-      bookBody.textContent = 'Available';
+      bookReservation.textContent = 'Available';
       bookBtn.textContent = 'Book';
-      bookBtn.onclick = reserve_desk;
-      bookBtn.style.display = 'inline-block';
+      if(canReserve){
+        bookBtn.onclick = reserve_desk;
+        bookBtn.style.display = 'inline-block';
+      }
+      else {
+        bookBtn.setAttribute('disabled', true);
+      }
     }
   }
 
