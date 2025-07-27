@@ -50,9 +50,10 @@ class Booking(db.Model):
     #     self.end_time = end_time
     #     self.user_id = user_id
 
-    def __init__(self, desk_id, day):
+    def __init__(self, desk_id, day, user_id):
         self.desk_id = desk_id
         self.day = day
+        self.user_id = user_id
 
     def __repr__(self):
         return f'<Booking {self.id}>'

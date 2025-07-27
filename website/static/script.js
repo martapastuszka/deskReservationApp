@@ -3,63 +3,73 @@
 // =======================================================================================
 
 const monthYearElement = document.getElementById('monthYear');
-const datesElement = document.getElementById('dates');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
+const datesElement     = document.getElementById('dates');
+const prevBtn          = document.getElementById('prevBtn');
+const nextBtn          = document.getElementById('nextBtn');
 
-let currentDate = new Date();
-let selectedDate = currentDate.setHours(0, 0, 0, 0);
-selectedDate = toSqlDateTime(currentDate);
+let currentDate   = new Date();                
+currentDate.setHours(0, 0, 0, 0);
+let selectedDate  = toSqlDateTime(currentDate);
+
+const rangeStart = new Date();                   // today 00:00
+rangeStart.setHours(0, 0, 0, 0);
+const rangeEnd   = new Date(rangeStart);         // today + 14 days 23:59
+rangeEnd.setDate(rangeEnd.getDate() + 14);
 
 const updateCalendar = () => {
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
+  const currentYear  = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
 
-    const firstDay = new Date(currentYear, currentMonth, 0);
-    const lastDay = new Date(currentYear, currentMonth+1, 0);
-    const totalDays = lastDay.getDate();
-    const firstDayIndex = firstDay.getDay();
-    const lastDayIndex = lastDay.getDay();
+  const firstDay     = new Date(currentYear, currentMonth, 1); // 1st of month
+  const lastDay      = new Date(currentYear, currentMonth + 1, 0); // last of month
+  const totalDays    = lastDay.getDate();
+  const startWeekIdx = firstDay.getDay();
+  const endWeekIdx   = lastDay.getDay();
 
-    const monthYearString = currentDate.toLocaleString
-    ('default', {month: 'long', year: 'numeric'});
-    // monthYearElement.textContent = monthYearString;
+  const monthYearString = currentDate.toLocaleString('default', {
+    month: 'long', year: 'numeric'
+  });
+  monthYearElement.textContent = monthYearString;
 
-    let datesHTML = '';
+  let datesHTML = '';
 
-    for(let i = firstDayIndex; i > 0; i--){
-        const prevDate = new Date(currentYear, currentMonth, 0 - i +1);
-        // datesHTML += `<div class = "date inactive" data-date="${prevDate.toISOString()}">${prevDate.getDate()}</div>`;
-        datesHTML += `<div class = "date inactive" >${prevDate.getDate()}</div>`;
-    }
+  // ---- previous-month leading blanks ----
+  for (let i = startWeekIdx; i > 0; i--) {
+    const prevDate = new Date(currentYear, currentMonth, 1 - i);
+    datesHTML += `<div class="date inactive">${prevDate.getDate()}</div>`;
+  }
 
-    for(let i =1; i <= totalDays; i++){
-        const date = new Date(currentYear, currentMonth, i, 0, 0, 0, 0);
-        const isToday    = date.toDateString() === new Date().toDateString();
-        const isSelected = toSqlDateTime(date) === selectedDate;
-        const isPast     = date < currentDate;
-        datesHTML += `<div class="date ${isToday ? 'active' : ''} ${isSelected ? 'selected' : ''} ${isPast ? 'inactive' : ''}"
-                   data-date="${date.toISOString()}">${i}</div>`;
-    }
+  // ---- current-month days ----
+  for (let i = 1; i <= totalDays; i++) {
+    const date = new Date(currentYear, currentMonth, i, 0, 0, 0, 0);
 
-    for(let i = 1; i <= 7 - lastDayIndex; i++){
-        const nextDate = new Date(currentYear, currentMonth + 1, i);
-        // datesHTML += `<div class="date inactive" data-date="${nextDate.toISOString()}">${nextDate.getDate()}</div>`;
-        datesHTML += `<div class="date inactive">${nextDate.getDate()}</div>`;
-    }
+    const isToday    = date.getTime() === rangeStart.getTime();
+    const isSelected = toSqlDateTime(date) === selectedDate;
 
-    datesElement.innerHTML = datesHTML;
-}
+    // limit selectable dates to [rangeStart, rangeEnd]
+    const isInactive = date < rangeStart || date > rangeEnd;
 
-// prevBtn.addEventListener('click', () => {
-//     currentDate.setMonth(currentDate.getMonth() - 1);
-//     updateCalendar();
-// })
+    datesHTML += `<div class="date ${isToday ? 'active' : ''} ${isSelected ? 'selected' : ''} ${isInactive ? 'inactive' : ''}" data-date="${date.toISOString()}">${i}</div>`;
+  }
 
-// nextBtn.addEventListener('click', () => {
-//     currentDate.setMonth(currentDate.getMonth() + 1);
-//     updateCalendar();
-// })
+  // ---- next-month trailing blanks ----
+  for (let i = 1; i < 7 - endWeekIdx; i++) {
+    const nextDate = new Date(currentYear, currentMonth + 1, i);
+    datesHTML += `<div class="date inactive">${nextDate.getDate()}</div>`;
+  }
+
+  datesElement.innerHTML = datesHTML;
+};
+
+prevBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    updateCalendar();
+})
+
+nextBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    updateCalendar();
+})
 
 datesElement.addEventListener('click', e => {
     const cell = e.target.closest('.date'); 
@@ -72,6 +82,7 @@ datesElement.addEventListener('click', e => {
     console.log("Clicked: ", selectedDate)
   
     updateCalendar(); 
+    updateDesks();
   });
 
 function toSqlDateTime(date) {
@@ -109,7 +120,7 @@ updateCalendar();
       .then(res => res.json())
       .then(data => {
         if(data.success) {
-          updateModalButton(data.reserved);
+          updateModal(data, selectedDesk, selectedDate);
         } else {
           alert('Failed to get desk status');
         }
@@ -117,6 +128,46 @@ updateCalendar();
       .catch(err => console.error(err));
     });
   });
+
+
+  function updateDesks() {
+    if (!selectedDate) return; // extra safety – make sure a date is chosen first
+  
+    fetch('/get-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: selectedDate })
+    })
+      .then(res => res.json().then(data => ({ status: res.status, body: data })))
+      .then(({ status, body }) => {
+        if (status === 200 && body.success) {
+          console.log(body.desks);
+
+          document.querySelectorAll('#floorplan .desk').forEach(el => {
+            el.style.fill = 'transparent';
+          });
+
+          body.desks.forEach(({ desk_id, user_id }) => {
+            const selector = `#${CSS.escape(desk_id)}, [data-desk-id="${desk_id}"]`;
+            const deskEl = document.querySelector(selector);
+            if (!deskEl) return; // desk not in the current SVG
+
+            if (user_id === CURRENT_USER_ID) {
+              deskEl.style.fill = '#1db954'; // green – my reservation
+            } else {
+              deskEl.style.fill = '#ff4d4f'; // red – someone else
+            }
+          });
+        } else {
+          alert(body.message || 'Something went wrong when loading desk data.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Network or server error while fetching bookings.');
+      });
+  }
+  
 
 
   function reserve_desk(){
@@ -131,12 +182,13 @@ updateCalendar();
     .then(({ status, body }) => {
       if (status === 200 && body.success) {
         alert('Desk reserved successfully!');
-        updateModalButton(body.reserved);
+        // updateModal(body.reserved);
       } else {
         alert(body.message || 'Something went wrong');
       }
     const modalEl = document.getElementById('myModal');
     $(modalEl).modal('hide');
+    updateDesks();
     })
     .catch(err => console.error(err));
   }
@@ -154,28 +206,44 @@ updateCalendar();
     .then(({ status, body }) => {
       if (status === 200 && body.success) {
         alert('Reservation cancelled successfully!');
-        updateModalButton(body.reserved);
+        // updateModal(body.reserved);
       } else {
         alert(body.message || 'Something went wrong while cancelling reservation');
       }
     const modalEl = document.getElementById('myModal');
     $(modalEl).modal('hide');
+    updateDesks();
 
   })
   .catch(err => console.error(err));
   }
 
 
-  function updateModalButton(isReserved){
+  function updateModal(data, desk, date){
     const bookBtn = document.getElementById('book-btn');
-    if(isReserved){
-      bookBtn.textContent = 'Cancel reservation';
-      bookBtn.onclick = cancel_reservation;
+    const titleEl = document.querySelector('#myModal .modal-title');
+    const bookBody = document.getElementById('book-body');
+    // bookDate.textContent = 'At: ' + date.split(" ")[0];
+    titleEl.textContent = "Desk: " + desk + " at: " + date.split(" ")[0] + " is"
+    if(data.reserved){
+      bookBody.textContent = `Reserved by ${data.bookedByMe ? 'You' : data.user_name}`;
+      if(data.bookedByMe){
+        bookBtn.textContent = 'Cancel reservation';
+        bookBtn.onclick = cancel_reservation;
+        bookBtn.style.display = 'inline-block';
+      }
+      else{
+        bookBtn.style.display = 'none';
+      }
     }else{
+      bookBody.textContent = 'Available';
       bookBtn.textContent = 'Book';
       bookBtn.onclick = reserve_desk;
+      bookBtn.style.display = 'inline-block';
     }
   }
+
+  updateDesks();
 
   // function closeModal(){
   //   console.log('closeModal sie wywoluje');
@@ -213,7 +281,7 @@ updateCalendar();
 //       if (status === 200 && body.success) {
 //         alert('Desk reserved successfully!');
 //         //color the desk red
-//         updateModalButton(body.reserved);
+//         updateModal(body.reserved);
 //         console.log(body.reserved);
 //         // bookBtn.textContent = "Cancel reservation";
 //         // bookBtn.removeEventListener('click', bookDesk);

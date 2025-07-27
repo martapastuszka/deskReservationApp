@@ -24,22 +24,28 @@
 <body>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?> -->
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+<script>
+   const CURRENT_USER_ID = {{ user.id }};  // safely JSON-encode the value
+</script>
 
 <nav class = "navbar navbar-expand-lg navbar-dark bg-dark">
+   <span class="navbar-text text-light me-auto">
+      Hello {{ user.first_name }}
+    </span>
    <div class="container-fluid main-container bg-light">
       <div class = "row h-100">
          <div class="col-12 bg-dark text-light p-3">
             <ul class="nav flex-column">
                <div class = "calendar">
                   <div class = "header">
-                     <!-- <button id="prevBtn">
+                     <button id="prevBtn">
                         <i class="fa-solid fa-chevron-left"></i>
                      </button>
                      <div class = "monthYear" id= "monthYear"> </div>
                      <button id="nextBtn">
                         <i class="fa-solid fa-chevron-right"></i>
-                     </button>     -->
-                     <div class = "monthYear" id= "monthYear">Lipiec 2025</div>
+                     </button>    
+                     <!-- <div class = "monthYear" id= "monthYear"></div> -->
                   </div>
                   <div class = "days">
                      <div class = "day">Mo</div>
@@ -96,7 +102,7 @@
                   data-bs-toggle="modal"
                   data-bs-target="#myModal"
                   class = "desk"
-                  style="fill:#59a5a7;stroke:#000000;stroke-width:1.13401;stroke-opacity:1"
+                  style="fill:transparent;stroke:#000000;stroke-width:1.13401;stroke-opacity:1"
                   transform="matrix(0.99259511,0.12146997,-0.21218175,0.97723022,0,0)"
                   d="m 232.06531,64.002945 11.36514,0.828294 c 0.0545,10.90488 0.17455,21.815505 0.18361,32.716376 L 231.6719,96.402984 Z">
                </path>
@@ -109,6 +115,25 @@
                   style="fill:transparent;stroke:#000000;stroke-width:1.13161;stroke-opacity:1"
                   d="m 228.02006,93.128674 11.10523,2.189957 c -2.25972,10.663199 -4.45559,21.339979 -6.75957,31.993739 l -11.61086,-2.56918 z">
                </path>
+               <path
+                  id="d3"
+                  data-desk-id="d3"
+                  data-bs-toggle="modal"
+                  data-bs-target="#myModal"
+                  class = "desk"
+                  style="fill:transparent;stroke:#000000;stroke-width:1.13401;stroke-opacity:1"
+                  transform="matrix(0.99259511,0.12146997,-0.21218175,0.97723022,0,0)"
+                  d="m 332.06531,164.002945 11.36514,0.828294 c 0.0545,10.90488 0.17455,21.815505 0.18361,32.716376 L 231.6719,96.402984 Z">
+               </path>
+               <path
+                  id="d4"
+                  data-desk-id="d4"
+                  data-bs-toggle="modal"
+                  data-bs-target="#myModal"
+                  class = "desk"
+                  style="fill:transparent;stroke:#000000;stroke-width:1.13161;stroke-opacity:1"
+                  d="m 328.02006,193.128674 11.10523,2.189957 c -2.25972,10.663199 -4.45559,21.339979 -6.75957,31.993739 l -11.61086,-2.56918 z">
+               </path>
             </svg>
 
             <div class="modal" id="myModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">>
@@ -116,10 +141,11 @@
                  <div class="modal-content">
                   <form method='POST' action={{ur}}>
                    <div class="modal-header">
-                     <h5 class="modal-title">Available </h5>
+                     <h5 class="modal-title">Title </h5>
                      <span class="close-modal" data-bs-dismiss="modal" aria-label="Close">&times;</span>
                    </div>
-                   <div class="modal-body">
+                   <div id="book-body" class="modal-body">
+                     <span> </span>
                      <!-- <div class="time-inputs">
                         <div class="time-group">
                            <label for="start-time">Start</label>
