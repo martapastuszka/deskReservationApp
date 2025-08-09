@@ -23,8 +23,10 @@ const updateCalendar = () => {
   const firstDay     = new Date(currentYear, currentMonth, 1); // 1st of month
   const lastDay      = new Date(currentYear, currentMonth + 1, 0); // last of month
   const totalDays    = lastDay.getDate();
-  const startWeekIdx = firstDay.getDay();
-  const endWeekIdx   = lastDay.getDay();
+
+  const mapToMonFirst = d => (d + 6) % 7;
+  const startWeekIdx = mapToMonFirst(firstDay.getDay());
+  const endWeekIdx   = mapToMonFirst(lastDay.getDay());
 
   const monthYearString = currentDate.toLocaleString('default', {
     month: 'long', year: 'numeric'
@@ -83,6 +85,7 @@ datesElement.addEventListener('click', e => {
   
     updateCalendar(); 
     updateDesks();
+    updateStats();
   });
 
 function toSqlDateTime(date) {
@@ -106,6 +109,8 @@ updateCalendar();
 // =======================================================================================
 
   let selectedDesk = null;
+  const svg = document.getElementById("floorplan");
+  const totalDeskCount = svg.querySelectorAll("path.desk").length;
 
   // Capture the click on any desk
   document.querySelectorAll('svg .desk').forEach(path => {
@@ -189,6 +194,7 @@ updateCalendar();
     const modalEl = document.getElementById('myModal');
     $(modalEl).modal('hide');
     updateDesks();
+    updateStats();
     })
     .catch(err => console.error(err));
   }
@@ -213,7 +219,7 @@ updateCalendar();
     const modalEl = document.getElementById('myModal');
     $(modalEl).modal('hide');
     updateDesks();
-
+    updateStats();
   })
   .catch(err => console.error(err));
   }
@@ -267,7 +273,40 @@ updateCalendar();
     }
   }
 
+  function updateStats(){
+    if (!selectedDate) return; // extra safety – make sure a date is chosen first
+  
+    fetch('/get-stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: selectedDate })
+    })
+      .then(res => res.json().then(data => ({ status: res.status, body: data })))
+      .then(({ status, body }) => {
+        if (status === 200 && body.success) {
+          const desks = document.getElementById('stat-desks');
+          const users = document.getElementById('stat-users');
+          const day = document.getElementById('stat-day');
+          const week = document.getElementById('stat-week');
+          const month = document.getElementById('stat-month');
+
+          desks.textContent = `${totalDeskCount}`;
+          users.textContent = `${body.users}`;
+          day.textContent = `${((body.day / totalDeskCount) * 100).toFixed(1)}% (${body.day})`;
+          week.textContent = `${((body.week / (totalDeskCount * 7)) * 100).toFixed(1)}% (${body.week})`;
+          month.textContent = `${((body.month / (totalDeskCount * 31)) * 100).toFixed(1)}% (${body.month})`;
+        } else {
+          alert(body.message || 'Something went wrong when loading stats.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Network or server error while fetching bookings.');
+      });
+  }
+
   updateDesks();
+  updateStats();
 
   // function closeModal(){
   //   console.log('closeModal sie wywoluje');

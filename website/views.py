@@ -71,6 +71,48 @@ def desk_status():
         return jsonify(success=False, message=str(e)), 500
 
 
+@views.route('/get-stats', methods=['POST'])
+def get_stats():
+    try:
+        data      = request.get_json(silent=True) or {}
+        date_str  = data.get('date')
+
+        if not date_str:
+            return jsonify(success=False, message='Missing date'), 400
+
+        date_obj   = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+        day_start  = datetime.combine(date_obj.date(), datetime.min.time())
+        day_end    = day_start + timedelta(days=1)
+        week_start = day_start - timedelta(days=day_start.weekday())  # Monday 00:00
+        week_end   = week_start + timedelta(days=7)
+        month_start = datetime(date_obj.year, date_obj.month, 1)
+        next_month  = month_start.replace(day=28) + timedelta(days=4)  # forces next month
+        month_end   = next_month.replace(day=1)
+
+        total_users = db.session.query(func.count(User.id)).scalar()
+
+        reserved_day = db.session.query(func.count(Booking.id))\
+            .filter(Booking.day >= day_start, Booking.day < day_end).scalar()
+
+        reserved_week = db.session.query(func.count(Booking.id))\
+            .filter(Booking.day >= week_start, Booking.day < week_end).scalar()
+
+        reserved_month = db.session.query(func.count(Booking.id))\
+            .filter(Booking.day >= month_start, Booking.day < month_end).scalar()
+
+        payload = {
+            'success': True,
+            'users': total_users,
+            'day': reserved_day,
+            'week': reserved_week,
+            'month': reserved_month
+        }
+        return jsonify(payload), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify(success=False, message=str(e)), 500
+
 
 @views.route('/get-bookings', methods=['POST'])
 def get_bookings():
